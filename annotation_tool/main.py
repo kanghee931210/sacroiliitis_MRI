@@ -103,7 +103,12 @@ class App(QWidget):
 
         self.label.update()
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())
+
+#  A  A
+# (‘ㅅ‘=)
+# J.M.Seo
