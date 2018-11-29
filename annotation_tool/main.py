@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 import re
@@ -14,6 +15,7 @@ class App(QWidget):
         self.top = 10
         self.width = 640
         self.height = 640
+        self.curdir = None
         self.initUI()
 
     def initUI(self):
@@ -36,19 +38,20 @@ class App(QWidget):
         load_btn.move(20, 600)
         load_btn.clicked.connect(self.openFileNameDialog)
 
-        next_btn = QPushButton("Next", self)
+        next_btn = QPushButton("Prev", self)
         next_btn.move(140, 600)
-        next_btn.clicked.connect(self.openFileNamesDialog)
+        next_btn.clicked.connect(self.clicked_prev)
 
-        prev_btn = QPushButton("Prev", self)
+        prev_btn = QPushButton("Next", self)
         prev_btn.move(260, 600)
-        prev_btn.clicked.connect(self.saveFileDialog)
+        prev_btn.clicked.connect(self.clicked_next)
 
     def load_file_list_curdir(self):
         file_list = sorted(os.listdir(self.curdir))
         p = re.compile(".*[.](?=png$|jpg$|jpeg$|PNG$|JPG$|JPEG$).*$")
 
-        return [os.path.join(self.curdir, file_name) for file_name in file_list if p.search(file_name)]
+        #return [os.path.join(self.curdir, file_name) for file_name in file_list if p.search(file_name)]
+        return [self.curdir + '/' + file_name for file_name in file_list if p.search(file_name)]
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -58,38 +61,32 @@ class App(QWidget):
         self.curdir = os.path.dirname(fileName)
 
         if fileName:
-            print(fileName)
-            print(self.curdir)
             self.curdir_file_list = self.load_file_list_curdir()
-
-            print(fileName in self.curdir_file_list)
-            print(type(self.curdir_file_list[0]))
-            print(fileName)
             print(self.curdir_file_list)
             print(fileName)
-
-            self.idx = self.curdir_file_list.index(fileName)
-            self.max_idx = len(self.curdir_file_list) - 1
-
-            print(self.idx, self.max_idx)
             self.label.setPixmap(QPixmap(fileName))
+            self.idx = self.curdir_file_list.index(fileName)
+            self.num_file = len(self.curdir_file_list)
 
-    def openFileNamesDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        files, _ = QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
-                                                "All Files (*);;Python Files (*.py)", options=options)
-        if files:
-            print(files)
+    def clicked_next(self):
+        if self.curdir:
+            self.idx = self.check_minmax(self.idx + 1)
+            self.label.setPixmap(QPixmap(self.curdir_file_list[self.idx]))
+            print(self.curdir_file_list[self.idx])
 
-    def saveFileDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
-                                                  "All Files (*);;Text Files (*.txt)", options=options)
-        if fileName:
-            print(fileName)
+    def clicked_prev(self):
+        if self.curdir:
+            self.idx = self.check_minmax(self.idx - 1)
+            self.label.setPixmap(QPixmap(self.curdir_file_list[self.idx]))
+            print(self.curdir_file_list[self.idx])
 
+    def check_minmax(self, _idx):
+        if _idx < 0:
+            return 0
+        elif _idx >= self.num_file:
+            return self.num_file-1
+        else:
+            return _idx
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
