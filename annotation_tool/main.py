@@ -92,16 +92,28 @@ class App(QWidget):
     def mousePressEvent(self, e):
         if e.buttons() & Qt.LeftButton and self.curdir:
 
-            print(e.x(), e.y())
+            cur_point = [e.x()-20, e.y()-20]
             self.label.setPixmap(self.org_pixmap)
             painter = QPainter(self.label.pixmap())
 
             pen = QPen(Qt.red)
             pen.setWidth(5)
             painter.setPen(pen)
-            painter.drawPoint(e.x()-20, e.y()-20)
+            painter.drawPoint(cur_point[0], cur_point[1])
+
+            self.saveTextFile(cur_point)
 
         self.label.update()
+
+    def saveTextFile(self, point):
+        cur_file_name = re.sub(".png$|.jpg$|.jpeg$|.PNG$|.JPG$|.JPEG$", ".txt", self.curdir_file_list[self.idx])
+
+        with open(cur_file_name, 'w') as f:
+            for i, element in enumerate(point):
+                f.write(str(element))
+                if not i+1 == len(point):
+                    f.write(",")
+
 
 
 if __name__ == '__main__':
