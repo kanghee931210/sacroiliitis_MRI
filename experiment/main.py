@@ -12,7 +12,13 @@
 
 import os
 import re
+import sys
 import argparse
+
+
+"""##################### import requirement custom code ######################"""
+
+from . import model_selector as selector
 
 
 """####################### import requirement library ########################"""
@@ -22,18 +28,26 @@ parser.add_argument('--data_root', type=str, help="set data root")
 parser.add_argument('--text_root', type=str, help="set train test split file root")
 parser.add_argument('--split_num', type=int, help='set train test split number')
 parser.add_argument('--save_root', type=str, default="./")
-parser.add_argument('--model', type=str,
-                    choices=['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101','resnet152'], help='set model')
-parser.add_argument('--pretrained', type=str, default='true')
 parser.add_argument('--img_size', type=int, default=224, help="set train image size")
 parser.add_argument('--learning_rate', '--lr', type=float, default=0.001, help="set train learning rate")
 parser.add_argument('--batch_size', '--bs', type=int, default=16, help="set batch size")
 parser.add_argument('--epoch', type=int, default=10000, help="set train epoch number")
+parser.add_argument('--pretrained', type=str, default='true')
+parser.add_argument('--model', type=str,
+                    choices=['resnet18', 'resnet34', 'resnet50', 'resnet101','resnet152'], help='set model')
+
+
+"""############################ main loop fuction ############################"""
+
+def main():
+
+    global args
+    args = parser.parse_args()
+    model = selector.set_model(args.model, args.pretrained)
 
 
 if __name__ == "__main__":
-    global args
-    args = parser.parse_args()
+    main()
 
 #  A  A
 # (‘ㅅ‘=)
