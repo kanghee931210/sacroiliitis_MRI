@@ -14,11 +14,13 @@ import os
 import re
 import sys
 import argparse
+import torch.nn as nn
+import torch.optim as optim
 
 
 """##################### import requirement custom code ######################"""
-
 from . import model_selector as selector
+from .util.model_util import *
 
 
 """####################### import requirement library ########################"""
@@ -44,6 +46,17 @@ def main():
     global args
     args = parser.parse_args()
     model = selector.set_model(args.model, args.pretrained)
+
+    # TODO: data load step
+
+    loss_func = nn.BCELoss()
+    optimizer = optim.SGD(model.parameters(), args.learning_rate, momentum=0.9)
+
+    for epoch in range(1, args.epoch+1):
+        train_acc, train_loss, model = train_1epoch(model, train_loader, optimizer, loss_func, epoch, args.epoch)
+        print("Train Accuacy:", train_acc, "Train Loss:", train_loss)
+        test_acc, test_loss, pred = test_1epoch(model, test_loader, loss_func, epoch, args.epoch)
+        print("Validation Accuracy:", test_acc, "Validation Loss:", test_loss)
 
 
 if __name__ == "__main__":
